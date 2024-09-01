@@ -1,0 +1,40 @@
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+import mysql.connector as sql # imports the sql adapter
+db = sql.connect(
+host="localhost",
+user="sample",
+passwd="sample",
+database="sample"
+) # init the sql connection
+cursor = db.cursor()
+reader = SimpleMFRC522()
+# cursor.execute('SELECT * FROM sample')
+# result = cursor.fetchall()
+# print(result)
+# cursor.execute('INSERT INTO sample VALUES (\'hello\');')
+# db.commit()
+# cursor.execute('SELECT * FROM sample')
+# result = cursor.fetchall()
+# print(result)
+source = input('enter source : ')
+destination = input('enter destination : ')
+try:
+id, text = reader.read()
+cursor.execute('SELECT * FROM station')
+result = cursor.fetchall()
+for x in result:
+if (source == x[0] and destination == x[1]):
+print('found entry', x)
+print(cursor)
+qury = 'UPDATE passengers SET balance = balance - {} WHERE tag_no = 
+\'{}\';'.format(x[2], id)
+# qury = 'UPDATE passengers SET balance = balance - {};'.format(x[2], id)
+cursor.execute(qury)
+db.commit()
+print('ticket from {} to {} confirmed'.format(x[0], x[1]))
+cursor.execute('SELECT * FROM passengers')
+result = cursor.fetchall()
+print(result)
+finally:
+GPIO.cleanup()
