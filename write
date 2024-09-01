@@ -1,0 +1,29 @@
+import RPi.GPIO as GPIO
+from mfrc522 import SimpleMFRC522
+import mysql.connector as sql 
+db = sql.connect(
+host="localhost",
+user="sample",
+passwd="sample",
+database="sample"
+) 
+cursor = db.cursor()
+reader = SimpleMFRC522()
+try:
+print('place the card')
+id = reader.read()[0]
+name = input('enter your name : ')
+phone_number = input('enter your phone number : ')
+credit = input('enter your amount : ') 
+# print("place your tag to write")
+# reader.write(text)
+21 | 27 P a g e M i n i P r o j e c t 2 0 2 3 - 2 0 2 4
+print('creating a record with {}, {}, {}, {}'.format(id, name, phone_number, credit))
+cursor.execute('INSERT INTO passengers VALUES (\'{}\', \'{}\', {}, {});'.format(id, name, 
+phone_number, credit)) # insert into sample
+db.commit()
+cursor.execute('SELECT * FROM passengers')
+result = cursor.fetchall()
+print(result)
+finally:
+GPIO.cleanup()
